@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild *)",
+      "Bash(git *)",
+      "Bash(grep -E \"\\(Navigation|Screen|Action|Coordinator|View\\)\\\\.swift$\")",
+      "Bash(brew --version)",
+      "Bash(pdftotext *)"
+    ]
+  }
+}
