@@ -47,10 +47,15 @@ struct AppNavigationHost: View {
 		AppRouteFactory.make(route: route, diFactory: diFactory)
 	}
 
-	private func router(for context: ContainerKind) -> (AppRoute, PresentStyle) -> Void {
-		{ route, style in
-			navigate(route, style, context: context)
-		}
+	private func router(for context: ContainerKind) -> AppRouter {
+		AppRouter(
+			navigate: { route, style in
+				navigate(route, style, context: context)
+			},
+			popTo: { key in
+				popTo(key, in: context)
+			}
+		)
 	}
 
 	private func navigate(_ route: AppRoute, _ style: PresentStyle, context: ContainerKind) {
@@ -79,6 +84,17 @@ struct AppNavigationHost: View {
 			appendToDeepestPath(route, in: nav.rootSheet)
 		case .modal:
 			appendToDeepestPath(route, in: nav.rootModal)
+		}
+	}
+
+	private func popTo(_ key: AppRouteKey, in context: ContainerKind) {
+		switch context {
+		case .root:
+			popTo(key, rootRoute: nav.rootRoute, path: &nav.rootPath)
+		case .sheet:
+			popTo(key, in: nav.rootSheet)
+		case .modal:
+			popTo(key, in: nav.rootModal)
 		}
 	}
 
@@ -126,6 +142,29 @@ struct AppNavigationHost: View {
 			return
 		}
 		node.path.append(route)
+	}
+
+	private func popTo(_ key: AppRouteKey, rootRoute: AppRoute, path: inout [AppRoute]) {
+		if let index = path.lastIndex(where: { $0.key == key }) {
+			path.removeSubrange(path.index(after: index)..<path.endIndex)
+			return
+		}
+		if rootRoute.key == key {
+			path.removeAll()
+		}
+	}
+
+	private func popTo(_ key: AppRouteKey, in node: PresentationNode?) {
+		guard let node else { return }
+		if let modal = node.modal {
+			popTo(key, in: modal)
+			return
+		}
+		if let sheet = node.sheet {
+			popTo(key, in: sheet)
+			return
+		}
+		popTo(key, rootRoute: node.route, path: &node.path)
 	}
 
 	private func setChildSheet(_ route: AppRoute, in node: PresentationNode?) {
@@ -261,7 +300,7 @@ private struct PresentationHost<Destination: View>: View {
 	@ObservedObject var node: PresentationNode
 	let context: ContainerKind
 	let destination: (AppRoute) -> Destination
-	let routerBuilder: (ContainerKind) -> (AppRoute, PresentStyle) -> Void
+	let routerBuilder: (ContainerKind) -> AppRouter
 
 	var body: some View {
 		CompatibleNavigationStack(

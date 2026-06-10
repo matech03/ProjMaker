@@ -135,6 +135,7 @@ Khi thêm màn hình mới:
 Style:
 
 - `.push`: push trong stack hiện tại.
+- `navigate.popTo(.home)`: pop về route có tên case trùng key trong stack hiện tại, không cần truyền lại associated values.
 - `.sheet`: bottom sheet.
 - `.modal`: full screen modal.
 - `.asRoot`: đặt route làm root mới và xoá stack/sheet/modal hiện tại.

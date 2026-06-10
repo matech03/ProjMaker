@@ -8,6 +8,23 @@ enum AppRoute: Hashable, Identifiable {
 	var id: String {
 		String(describing: self)
 	}
+
+	var key: AppRouteKey {
+		switch self {
+		case .splash:
+			.splash
+		case .home:
+			.home
+		case .welcome:
+			.welcome
+		}
+	}
+}
+
+enum AppRouteKey: Hashable {
+	case splash
+	case home
+	case welcome
 }
 
 enum AppRouteFactory {
