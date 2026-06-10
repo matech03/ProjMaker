@@ -1,11 +1,10 @@
 {
   "baseProject": "ProjMaker",
-  "baseVersion": "1.0",
+  "baseVersion": "1.1",
   "changeLogs": [
-    "Base: Clean Architecture iOS starter project.",
-    "Container: State-Intent-Effect base flow.",
-    "DI: Manual factory-based dependency wiring.",
-    "Navigation: Centralized route and router setup, simple navigate"
+    "AppDelegate",
+	"App-lifecycle state",
+	"Navigation: popTo"
   ],
   "generatedAt": null
 }

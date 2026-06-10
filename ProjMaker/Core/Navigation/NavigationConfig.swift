@@ -14,6 +14,7 @@ extension EnvironmentValues {
 
 enum PresentStyle: Hashable {
 	case push
+	case popTo
 	case sheet
 	case modal
 	case asRoot

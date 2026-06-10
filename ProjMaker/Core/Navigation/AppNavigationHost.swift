@@ -62,6 +62,8 @@ struct AppNavigationHost: View {
 		switch style {
 		case .push:
 			push(route, in: context)
+		case .popTo:
+			popTo(route, in: context)
 		case .sheet:
 			presentSheet(route, in: context)
 		case .modal:
@@ -79,6 +81,17 @@ struct AppNavigationHost: View {
 			appendToDeepestPath(route, in: nav.rootSheet)
 		case .modal:
 			appendToDeepestPath(route, in: nav.rootModal)
+		}
+	}
+
+	private func popTo(_ route: AppRoute, in context: ContainerKind) {
+		switch context {
+		case .root:
+			popTo(route, rootRoute: nav.rootRoute, path: &nav.rootPath)
+		case .sheet:
+			popTo(route, in: nav.rootSheet)
+		case .modal:
+			popTo(route, in: nav.rootModal)
 		}
 	}
 
@@ -126,6 +139,28 @@ struct AppNavigationHost: View {
 			return
 		}
 		node.path.append(route)
+	}
+
+	private func popTo(_ route: AppRoute, rootRoute: AppRoute, path: inout [AppRoute]) {
+		if rootRoute == route {
+			path.removeAll()
+			return
+		}
+		guard let index = path.firstIndex(of: route) else { return }
+		path.removeSubrange(path.index(after: index)..<path.endIndex)
+	}
+
+	private func popTo(_ route: AppRoute, in node: PresentationNode?) {
+		guard let node else { return }
+		if let modal = node.modal {
+			popTo(route, in: modal)
+			return
+		}
+		if let sheet = node.sheet {
+			popTo(route, in: sheet)
+			return
+		}
+		popTo(route, rootRoute: node.route, path: &node.path)
 	}
 
 	private func setChildSheet(_ route: AppRoute, in node: PresentationNode?) {

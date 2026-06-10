@@ -135,6 +135,7 @@ Khi thêm màn hình mới:
 Style:
 
 - `.push`: push trong stack hiện tại.
+- `.popTo`: pop về route đã có trong stack hiện tại.
 - `.sheet`: bottom sheet.
 - `.modal`: full screen modal.
 - `.asRoot`: đặt route làm root mới và xoá stack/sheet/modal hiện tại.
