@@ -2,10 +2,10 @@ import Foundation
 
 @MainActor
 final class ScreenDIFactory {
-	private let useCases: UseCaseDIFactory
+	private let repositories: RepositoryDIFactory
 
-	init(useCases: UseCaseDIFactory) {
-		self.useCases = useCases
+	init(repositories: RepositoryDIFactory) {
+		self.repositories = repositories
 	}
 
 	func makeSplashContainer() -> SplashContainer {
@@ -17,6 +17,6 @@ final class ScreenDIFactory {
 	}
 
 	func makeWelcomeContainer() -> WelcomeContainer {
-		WelcomeContainer(getWelcomeGreetingUseCase: useCases.makeGetWelcomeGreetingUseCase())
+		WelcomeContainer(welcomeRepository: repositories.welcomeRepository)
 	}
 }

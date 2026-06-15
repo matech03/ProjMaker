@@ -20,9 +20,9 @@ Presentation/Screens/<ScreenName>/
 
 - Container chạy trên `@MainActor`.
 - View chỉ đọc `container.state` và gửi `Intent`.
-- Business/data flow đi qua `UseCase`.
-- Container nhận UseCase qua initializer.
-- Container không tự tạo Service/Repository.
+- Business/data flow đi qua Repository protocol.
+- Container nhận Repository protocol qua initializer.
+- Container không tự tạo Service hoặc repository implementation.
 - Dependency được tạo trong `Core/DI`.
 - Async work nên chạy bằng `runTask(id:)` để dễ cancel/restart.
 
@@ -43,10 +43,10 @@ enum ProfileEffect {
 
 @MainActor
 final class ProfileContainer: BaseContainer<ProfileState, ProfileIntent, ProfileEffect> {
-    private let saveProfileUseCase: SaveProfileUseCase
+    private let profileRepository: ProfileRepository
 
-    init(saveProfileUseCase: SaveProfileUseCase) {
-        self.saveProfileUseCase = saveProfileUseCase
+    init(profileRepository: ProfileRepository) {
+        self.profileRepository = profileRepository
         super.init(initialState: ProfileState())
     }
 
@@ -67,7 +67,6 @@ final class ProfileContainer: BaseContainer<ProfileState, ProfileIntent, Profile
     }
 
     private func loadIfNeeded() async {
-        // load initial data
     }
 }
 ```
@@ -134,7 +133,7 @@ runTask(id: "load_profile") { [weak self] in
     guard let self else { return }
     self.state.isLoading = true
     defer { self.state.isLoading = false }
-    // await useCase.execute()
+    _ = try? await profileRepository.fetchProfile()
 }
 ```
 
@@ -144,7 +143,7 @@ Khi View disappear, `attachContainer` sẽ gọi `cancelAllTasks()` nếu `track
 
 1. Tạo `State`, user/business `Intent`, và one-shot `Effect`.
 2. Kế thừa `BaseContainer<State, Intent, Effect>`.
-3. Inject UseCase qua initializer nếu có dependency.
+3. Inject Repository protocol qua initializer nếu có dependency.
 4. Xử lý user/business action trong `dispatch(_:)`.
 5. Xử lý lifecycle trong `dispatchSystem(_:)` khi cần.
 6. Gửi one-shot event bằng `sendEffect(_:)`.

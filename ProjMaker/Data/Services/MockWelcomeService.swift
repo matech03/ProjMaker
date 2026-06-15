@@ -1,7 +1,7 @@
 import Foundation
 
 protocol WelcomeService {
-	func fetchWelcomeUser() async throws -> WelcomeUserDTO
+	func fetchWelcomeUser() async throws -> WelcomeUser
 }
 
 struct MockWelcomeService: WelcomeService {
@@ -12,9 +12,9 @@ struct MockWelcomeService: WelcomeService {
 		"Hello",
 		"Hi there",
 	]
-	func fetchWelcomeUser() async throws -> WelcomeUserDTO {
+	func fetchWelcomeUser() async throws -> WelcomeUser {
 		let name = AppInfo.appName
 		try await Task.sleep(nanoseconds: 180_000_000)
-		return WelcomeUserDTO(name: name, greeting: greetings.randomElement()!)
+		return WelcomeUser(name: name, greeting: greetings.randomElement()!)
 	}
 }

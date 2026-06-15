@@ -8,7 +8,6 @@ struct DefaultWelcomeRepository: WelcomeRepository {
 	}
 
 	func getWelcomeUser() async throws -> WelcomeUser {
-		let dto = try await service.fetchWelcomeUser()
-		return WelcomeUser(name: dto.name, greeting: dto.greeting)
+		try await service.fetchWelcomeUser()
 	}
 }

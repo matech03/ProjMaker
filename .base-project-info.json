@@ -1,10 +1,11 @@
 {
   "baseProject": "ProjMaker",
-  "baseVersion": "1.1",
+  "baseVersion": "1.2",
   "changeLogs": [
     "AppDelegate",
-	"App-lifecycle state",
-	"Navigation: popTo"
+    "App-lifecycle state",
+    "Navigation: popTo",
+    "Remove Domain/DTO layer; move models and repository protocols into Data"
   ],
   "generatedAt": null
 }

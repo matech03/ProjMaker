@@ -14,11 +14,11 @@ enum WelcomeEffect {
 
 @MainActor
 final class WelcomeContainer: BaseContainer<WelcomeState, WelcomeIntent, WelcomeEffect> {
-	private let getWelcomeGreetingUseCase: GetWelcomeGreetingUseCase
+	private let welcomeRepository: WelcomeRepository
 	private var hasLoaded = false
 
-	init(getWelcomeGreetingUseCase: GetWelcomeGreetingUseCase) {
-		self.getWelcomeGreetingUseCase = getWelcomeGreetingUseCase
+	init(welcomeRepository: WelcomeRepository) {
+		self.welcomeRepository = welcomeRepository
 		super.init(initialState: WelcomeState())
 	}
 
@@ -32,7 +32,8 @@ final class WelcomeContainer: BaseContainer<WelcomeState, WelcomeIntent, Welcome
 				self.state.isLoading = true
 				defer { self.state.isLoading = false }
 				do {
-					self.state.greeting = try await self.getWelcomeGreetingUseCase.execute()
+					let user = try await self.welcomeRepository.getWelcomeUser()
+					self.state.greeting = "\(user.greeting), \(user.name)"
 				} catch {
 					self.state.greeting = "Welcome"
 					Log.error("Failed to load welcome greeting: \(error)", category: "welcome")

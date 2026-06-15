@@ -10,7 +10,7 @@ Guide tổng cho project. Khi bắt đầu code gen/edit/refactor/fix/review, đ
 
 ## Cấu trúc project
 
-Project dùng Clean Architecture dạng layer-first.
+Project dùng layer-first architecture giản lược, không có tầng Domain riêng.
 
 ```text
 <ProjectName>/
@@ -22,8 +22,7 @@ Project dùng Clean Architecture dạng layer-first.
 ├── Utils/            # Shared helpers
 │   └── Extensions/   # Swift extensions
 ├── Presentation/     # Screens + shared UI components
-├── Domain/           # Models + Repository protocols + UseCases
-├── Data/             # DTOs + Services + Repository implementations
+├── Data/             # Models + repository protocols/implementations + services
 └── Resources/        # Image.xcassets + Color.xcassets
 ```
 
@@ -34,16 +33,16 @@ Thông tin base project nằm trong `.base-project-info.json` ở root project. 
 ## Dependency flow
 
 ```text
-Presentation -> Domain -> Data
+Presentation -> Repository protocol -> Repository implementation -> Service
 ```
 
 Rule chính:
 
 - `View` chỉ render UI, đọc `container.state`, gửi `Intent`.
-- `Container` xử lý state/intent/effect, gọi `UseCase`, không gọi `Service` trực tiếp.
-- `UseCase` phụ thuộc `Repository` protocol trong `Domain`.
-- `Repository implementation` trong `Data` gọi `Service` và map `DTO -> Domain Model`.
-- DTO chỉ nằm ở `Data`; UI không render trực tiếp từ DTO.
+- `Container` xử lý state/intent/effect, gọi `Repository` protocol, không gọi `Service` trực tiếp.
+- Repository protocol nằm trong `Data/Repositories` cùng repository implementation.
+- Model dùng cho business/UI state nằm trong `Data/Models`.
+- `Service` trả về Model; không tạo DTO layer riêng.
 - Dependency được tạo trong `Core/DI`, không tạo sâu trong View.
 
 ## Layer responsibilities
@@ -66,33 +65,19 @@ Presentation/
 - `Views`: UI components/custom views dùng chung giữa nhiều screen.
 - Nếu có side effect one-shot như navigate/alert/toast/dismiss, dùng `Effect`.
 
-### Domain
-
-Đặt trong:
-
-```text
-Domain/Models/
-Domain/Repositories/
-Domain/UseCases/
-```
-
-- Model dùng cho business/UI state.
-- Repository protocol.
-- UseCase cho từng business action rõ ràng.
-
 ### Data
 
 Đặt trong:
 
 ```text
-Data/DTOs/
+Data/Models/
 Data/Services/
 Data/Repositories/
 ```
 
-- DTO cho raw/request/response model.
-- Service cho API/local/mock/cache/keychain.
-- Repository implementation gọi Service và map sang Domain Model.
+- `Models`: model dùng cho business/UI state.
+- `Services`: API/local/mock/cache/keychain.
+- `Repositories`: repository protocol và implementation; implementation gọi Service.
 
 ### Core, Utils, Extensions
 
@@ -101,7 +86,7 @@ Data/Repositories/
 - `Core/Navigation`: centralized navigation.
 - `Core/DI`: manual DI bằng `DIFactory`.
 - `Utils`: helper dùng chung.
-- `Utils/Extensions`: Swift extensions dùng chung.
+- `Utils/Extensions`: extensions dùng chung.
 
 ## Naming convention
 
@@ -110,7 +95,7 @@ Data/Repositories/
 - State: `<Name>State`
 - Intent: `<Name>Intent`
 - Effect: `<Name>Effect`
-- UseCase: `<Action><Entity>UseCase`
+- Model: `<Entity>`
 - Repository protocol: `<Entity>Repository`
 - Repository implementation: `Default<Entity>Repository`
 - Service: `<Entity>Service` hoặc `<Purpose>Service`
@@ -148,7 +133,6 @@ Manual DI nằm trong `Core/DI`.
 AppDIFactory
 ├── ServiceDIFactory
 ├── RepositoryDIFactory
-├── UseCaseDIFactory
 └── ScreenDIFactory
 ```
 
@@ -156,7 +140,6 @@ Quy tắc:
 
 - Service singleton tạo trong `ServiceDIFactory`.
 - Repository singleton tạo trong `RepositoryDIFactory`.
-- UseCase tạo trong `UseCaseDIFactory`.
 - Screen container tạo trong `ScreenDIFactory`.
 - Không dùng `AppDIFactory.shared`.
 - Không dùng hậu tố `DIContainer` để tránh nhầm với screen `Container`.
@@ -166,22 +149,19 @@ Quy tắc:
 1. Tạo `Presentation/Screens/<ScreenName>/`.
 2. Tạo `<ScreenName>Screen.swift` và `<ScreenName>Container.swift`.
 3. Khai báo `State`, `Intent`, `Effect` trong container.
-4. Nếu có data/business flow, bổ sung `Domain` + `Data` đầy đủ.
+4. Nếu có data/business flow, bổ sung `Data/Models`, `Data/Services`, và `Data/Repositories`.
 5. Nếu có dependency mới, bổ sung factory tương ứng trong `Core/DI`.
 6. Nếu cần navigation, thêm `AppRoute` và mapping trong `AppRouteFactory`.
 7. Build và verify UI nếu có thay đổi giao diện.
 
 ## Workflow thêm chức năng có data
 
-1. Thêm/ cập nhật Domain Model nếu cần.
-2. Thêm DTO trong `Data/DTOs`.
-3. Thêm Service protocol/implementation trong `Data/Services`.
-4. Thêm Repository protocol trong `Domain/Repositories`.
-5. Thêm Repository implementation trong `Data/Repositories`.
-6. Thêm UseCase trong `Domain/UseCases`.
-7. Inject UseCase vào Container qua initializer.
-8. Đăng ký dependency trong `Core/DI`.
-9. UI chỉ đọc state và gửi intent.
+1. Thêm/cập nhật Model trong `Data/Models` nếu cần.
+2. Thêm Service protocol/implementation trong `Data/Services`.
+3. Thêm Repository protocol và implementation trong `Data/Repositories`.
+4. Inject Repository protocol vào Container qua initializer.
+5. Đăng ký dependency trong `Core/DI`.
+6. UI chỉ đọc state và gửi intent.
 
 ## Logging
 
@@ -197,11 +177,11 @@ Log.error("message", category: "welcome")
 
 ## Checklist trước khi xong
 
-- Đúng layer: `Presentation`, `Domain`, `Data`, `Core`.
+- Đúng layer: `Presentation`, `Data`, `Core`.
 - View không chứa business logic phức tạp.
-- Container gọi UseCase, không gọi Service trực tiếp.
-- Repository map DTO sang Domain Model.
-- DTO không truyền lên UI.
+- Container gọi Repository protocol, không gọi Service trực tiếp.
+- Repository implementation gọi Service khi cần data.
+- Model nằm trong `Data/Models`; không dùng DTO layer riêng.
 - Navigation đi qua `AppRoute`/`AppRouteFactory`/`router`.
 - Dependency mới được đăng ký trong `Core/DI`.
 - Không có `print(...)`.
