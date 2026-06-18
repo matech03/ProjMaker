@@ -19,6 +19,14 @@ enum AppInfo {
 		return Bundle.main.bundleIdentifier ?? ""
 	}
 
+	static var appGroup: String {
+		if let configuredAppGroup = value(for: "AppGroupIdentifier"), configuredAppGroup.isEmpty == false {
+			return configuredAppGroup
+		}
+		let identifier = bundleIdentifier.isEmpty ? "com.example.ProjMaker" : bundleIdentifier
+		return "group.\(identifier)"
+	}
+
 	static var versionAndBuild: String {
 		guard !version.isEmpty else { return build }
 		guard !build.isEmpty else { return version }
