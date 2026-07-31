@@ -3,7 +3,6 @@ import SwiftUI
 @MainActor
 struct WelcomeScreen: View {
 	@Environment(\.dismiss) private var dismiss
-	@Environment(\.router) private var navigate
 	@StateObject private var container: WelcomeContainer
 
 	let title: String

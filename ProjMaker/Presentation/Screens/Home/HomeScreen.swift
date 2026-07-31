@@ -2,7 +2,7 @@ import SwiftUI
 
 @MainActor
 struct HomeScreen: View {
-	@Environment(\.router) private var navigate
+	@Environment(\.router) private var router
 	@StateObject private var container: HomeContainer
 	@State private var showsWelcomeAlert = false
 
@@ -25,7 +25,7 @@ struct HomeScreen: View {
 			case .showWelcomeAlert:
 				showsWelcomeAlert = true
 			case let .navigate(route, style):
-				navigate(route, style)
+				router.navigate(to: route, style)
 			}
 		}
 		.alert("Welcome", isPresented: $showsWelcomeAlert) {

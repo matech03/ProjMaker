@@ -1,13 +1,8 @@
 {
   "baseProject": "ProjMaker",
-  "baseVersion": "1.3",
+  "baseVersion": "1.4",
   "changeLogs": [
-    "AppDelegate",
-    "App-lifecycle state",
-    "Navigation: popTo",
-    "Remove Domain/DTO layer; move models and repository protocols into Data",
-    "Add AppInfo.appGroup",
-    "Add UserDefaultStore with @KeyValueBinding backed by App Group UserDefaults"
+    "Rename AppRouter func",
   ],
   "generatedAt": null
 }

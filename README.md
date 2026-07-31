@@ -106,21 +106,21 @@ Data/Repositories/
 Navigation đi qua `AppRoute`, `AppRouteFactory`, và `router`.
 
 ```swift
-@Environment(\.router) private var navigate
+@Environment(\.router) private var router
 
-navigate(.welcome(showCloseButton: false), .push)
+router.navigate(to: .welcome(showCloseButton: false), .push)
 ```
 
 Khi thêm màn hình mới:
 
 1. Thêm case vào `AppRoute`.
 2. Map route trong `AppRouteFactory`.
-3. Từ screen gọi `navigate(route, style)`.
+3. Từ screen gọi `router.navigate(to: route, style)`.
 
 Style:
 
 - `.push`: push trong stack hiện tại.
-- `navigate.popTo(.home)`: pop về route có tên case trùng key trong stack hiện tại, không cần truyền lại associated values.
+- `router.pop(to: .home)`: pop về route có tên case trùng key trong stack hiện tại, không cần truyền lại associated values.
 - `.sheet`: bottom sheet.
 - `.modal`: full screen modal.
 - `.asRoot`: đặt route làm root mới và xoá stack/sheet/modal hiện tại.

@@ -16,22 +16,22 @@ extension EnvironmentValues {
 }
 
 struct AppRouter {
-	private let navigate: (AppRoute, PresentStyle) -> Void
+	private let navigateHandler: (AppRoute, PresentStyle) -> Void
 	private let popToRoute: (AppRouteKey) -> Void
 
 	init(
 		navigate: @escaping (AppRoute, PresentStyle) -> Void,
 		popTo: @escaping (AppRouteKey) -> Void
 	) {
-		self.navigate = navigate
+		self.navigateHandler = navigate
 		self.popToRoute = popTo
 	}
 
-	func callAsFunction(_ route: AppRoute, _ style: PresentStyle) {
-		navigate(route, style)
+	func navigate(to route: AppRoute, _ style: PresentStyle) {
+		navigateHandler(route, style)
 	}
 
-	func popTo(_ key: AppRouteKey) {
+	func pop(to key: AppRouteKey) {
 		popToRoute(key)
 	}
 }
