@@ -2,7 +2,7 @@ import SwiftUI
 
 @MainActor
 struct SplashScreen: View {
-	@Environment(\.router) private var navigate
+	@Environment(\.router) private var router
 	@StateObject private var container: SplashContainer
 
 	init(container: SplashContainer) {
@@ -23,7 +23,7 @@ struct SplashScreen: View {
 		.onReceive(container.effects) { effect in
 			switch effect {
 			case .navigateHome:
-				navigate(.home, .asRoot)
+				router.navigate(to: .home, .asRoot)
 			}
 		}
 	}
