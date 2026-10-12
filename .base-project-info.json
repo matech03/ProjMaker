@@ -1,8 +1,8 @@
 {
   "baseProject": "ProjMaker",
-  "baseVersion": "1.4",
+  "baseVersion": "1.5",
   "changeLogs": [
-    "Rename AppRouter func",
+    "Update gitignore",
   ],
   "generatedAt": null
 }
